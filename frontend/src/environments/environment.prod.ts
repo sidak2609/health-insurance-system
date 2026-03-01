@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://BACKEND_RAILWAY_URL/api'
+  apiUrl: 'https://health-insurance-backend-r5dt.onrender.com/api'
 };
