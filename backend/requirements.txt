@@ -8,6 +8,6 @@ python-multipart
 langchain
 langchain-community
 faiss-cpu
-sentence-transformers
+fastembed
 fpdf2
 psycopg2-binary
