@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+python-jose[cryptography]
+passlib[bcrypt]
+pydantic
+python-multipart
+langchain
+langchain-community
+faiss-cpu
+sentence-transformers
+fpdf2
+psycopg2-binary
