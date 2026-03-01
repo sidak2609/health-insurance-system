@@ -4,9 +4,35 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+import json
+from datetime import datetime, timedelta
+
 from app.db.database import create_tables, SessionLocal
-from app.db.models import Policy
+from app.db.models import Policy, User
 from app.api.routes import auth, eligibility, claims, policies, dashboard, premium, documents, notifications
+
+
+def _seed_demo_users(db):
+    from app.services.auth_service import hash_password
+    if db.query(User).count() > 0:
+        return
+    users = [
+        User(email="rajesh@patient.com", hashed_password=hash_password("password123"),
+             full_name="Rajesh Kumar", role="patient", age=35, bmi=26.2, is_smoker=False,
+             pre_existing_conditions=json.dumps(["diabetes", "hypertension"]),
+             created_at=datetime.utcnow() - timedelta(days=45)),
+        User(email="priya@patient.com", hashed_password=hash_password("password123"),
+             full_name="Priya Sharma", role="patient", age=28, bmi=22.1, is_smoker=True,
+             pre_existing_conditions=json.dumps(["asthma"]),
+             created_at=datetime.utcnow() - timedelta(days=30)),
+        User(email="admin@insurer.com", hashed_password=hash_password("password123"),
+             full_name="Dr. Amit Patel", role="insurer", company_name="Star Health Insurance",
+             created_at=datetime.utcnow() - timedelta(days=90)),
+    ]
+    for u in users:
+        db.add(u)
+    db.commit()
+    print("Demo users seeded.")
 
 
 @asynccontextmanager
@@ -26,6 +52,8 @@ async def lifespan(app: FastAPI):
                 print("FAISS vector store rebuilt from existing data.")
             except Exception as e:
                 print(f"Failed to build vector store: {e}")
+
+        _seed_demo_users(db)
     finally:
         db.close()
 
