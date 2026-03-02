@@ -11,3 +11,4 @@ faiss-cpu
 fastembed
 fpdf2
 psycopg2-binary
+anthropic

@@ -84,15 +84,49 @@ Chart.register(...registerables);
         </div>
       </div>
 
-      <!-- Top Conditions -->
-      <div class="section-card">
-        <h3>Top Conditions</h3>
-        <ul class="conditions-list">
-          <li *ngFor="let condition of dashboardData.top_conditions">
-            <span class="condition-name">{{ condition.condition || condition.name }}</span>
-            <span class="condition-count">{{ condition.count }}</span>
-          </li>
-        </ul>
+      <!-- Bottom Row: Top Conditions + Top Claim Types -->
+      <div class="bottom-row">
+        <!-- Top Conditions -->
+        <div class="section-card">
+          <h3>Top Conditions</h3>
+          <ul class="conditions-list" *ngIf="dashboardData.top_conditions?.length; else noConditions">
+            <li *ngFor="let condition of dashboardData.top_conditions">
+              <span class="condition-name">{{ condition.label }}</span>
+              <span class="condition-count">{{ condition.count }}</span>
+            </li>
+          </ul>
+          <ng-template #noConditions>
+            <p class="empty-state">No condition data available.</p>
+          </ng-template>
+        </div>
+
+        <!-- Top Claim Types -->
+        <div class="section-card">
+          <h3>Top Claim Types</h3>
+          <ul class="conditions-list" *ngIf="dashboardData.top_claim_types?.length; else noClaimTypes">
+            <li *ngFor="let claimType of dashboardData.top_claim_types">
+              <span class="condition-name">{{ claimType.label | titlecase }}</span>
+              <span class="condition-count">{{ claimType.count }}</span>
+            </li>
+          </ul>
+          <ng-template #noClaimTypes>
+            <p class="empty-state">No claim type data available.</p>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Age Demographics -->
+      <div class="section-card" *ngIf="dashboardData.age_demographics?.length">
+        <h3>Age Demographics</h3>
+        <div class="age-bars">
+          <div class="age-bar-row" *ngFor="let age of dashboardData.age_demographics">
+            <span class="age-label">{{ age.label }}</span>
+            <div class="bar-track">
+              <div class="bar-fill" [style.width]="getBarWidth(age.count, dashboardData.age_demographics) + '%'"></div>
+            </div>
+            <span class="age-count">{{ age.count }}</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -257,6 +291,70 @@ Chart.register(...registerables);
       font-weight: 600;
     }
 
+    .bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .bottom-row .section-card {
+      margin-bottom: 0;
+    }
+
+    .empty-state {
+      color: #aaa;
+      font-size: 14px;
+      padding: 16px 0;
+      text-align: center;
+    }
+
+    .age-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .age-bar-row {
+      display: grid;
+      grid-template-columns: 60px 1fr 40px;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .age-label {
+      font-size: 13px;
+      color: #555;
+      font-weight: 500;
+    }
+
+    .bar-track {
+      background: #e3f2fd;
+      border-radius: 4px;
+      height: 20px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      background: #1565C0;
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.6s ease;
+    }
+
+    .age-count {
+      font-size: 13px;
+      color: #555;
+      text-align: right;
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .bottom-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .loading {
       text-align: center;
       padding: 60px;
@@ -365,5 +463,10 @@ export class DashboardComponent implements OnInit {
         backgroundColor: '#1565C0'
       }]
     };
+  }
+
+  getBarWidth(count: number, items: any[]): number {
+    const max = Math.max(...items.map(i => i.count), 1);
+    return Math.round((count / max) * 100);
   }
 }
