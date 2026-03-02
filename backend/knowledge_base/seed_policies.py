@@ -6,7 +6,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from app.db.database import SessionLocal, create_tables
 from app.db.models import Policy, PolicySection
-from app.rag.ingest import build_vector_store
 
 
 POLICIES = [
@@ -1196,12 +1195,6 @@ def seed():
                 else:
                     print(f"{policy.name}: updated existing sections")
 
-        try:
-            print("Building FAISS vector store...")
-            build_vector_store(db)
-            print("Vector store built successfully.")
-        except Exception as e:
-            print(f"Warning: Could not build vector store: {e}")
         print("Seed/update complete!")
     finally:
         db.close()

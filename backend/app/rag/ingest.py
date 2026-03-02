@@ -1,68 +1,82 @@
-import os
+import json
+import re
 
-from langchain_core.documents import Document
-from langchain_community.vectorstores import FAISS
 from sqlalchemy.orm import Session
 
-from app.rag.embeddings import get_embeddings
 from app.db.models import PolicySection, Policy
 
-VECTOR_STORE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "vector_store")
 
-_vector_store = None
+class SimpleDoc:
+    """Lightweight document with page_content and metadata — replaces LangChain Document."""
+    def __init__(self, page_content: str, metadata: dict):
+        self.page_content = page_content
+        self.metadata = metadata
 
 
-def build_documents_from_db(db: Session) -> list[Document]:
-    sections = db.query(PolicySection).join(Policy).filter(Policy.is_active == True).all()
-    documents = []
+def keyword_search(db: Session, query: str, k: int = 8) -> list[SimpleDoc]:
+    """
+    DB-based keyword search over policy sections.
+    Scores each section by word frequency in content, title, and keyword tags.
+    No ML models or embeddings required — runs in ~1MB RAM.
+    """
+    query_words = set(re.findall(r'\b\w{3,}\b', query.lower()))
+
+    sections = (
+        db.query(PolicySection)
+        .join(Policy)
+        .filter(Policy.is_active == True)
+        .all()
+    )
+
+    if not sections:
+        return []
+
+    # If no meaningful query words, return first k sections
+    if not query_words:
+        return [
+            SimpleDoc(
+                page_content=s.section_content,
+                metadata={
+                    "policy_id": s.policy_id,
+                    "policy_name": s.policy.name,
+                    "section_title": s.section_title,
+                    "section_number": s.section_number,
+                },
+            )
+            for s in sections[:k]
+        ]
+
+    scored = []
     for section in sections:
-        policy = section.policy
-        doc = Document(
+        score = 0
+        content_lower = section.section_content.lower()
+        title_lower = section.section_title.lower()
+        try:
+            keywords = json.loads(section.keywords or "[]")
+        except Exception:
+            keywords = []
+
+        for word in query_words:
+            score += content_lower.count(word)
+            if word in title_lower:
+                score += 5  # title match weighted higher
+            if any(word in kw.lower() for kw in keywords):
+                score += 3  # keyword tag match
+
+        if score > 0:
+            scored.append((score, section))
+
+    scored.sort(key=lambda x: x[0], reverse=True)
+
+    results = []
+    for _, section in scored[:k]:
+        results.append(SimpleDoc(
             page_content=section.section_content,
             metadata={
-                "policy_id": policy.id,
-                "policy_name": policy.name,
-                "plan_type": policy.plan_type,
-                "section_id": section.id,
+                "policy_id": section.policy_id,
+                "policy_name": section.policy.name,
                 "section_title": section.section_title,
                 "section_number": section.section_number,
-                "keywords": section.keywords or "[]",
             },
-        )
-        documents.append(doc)
-    return documents
-
-
-def build_vector_store(db: Session) -> FAISS:
-    global _vector_store
-    documents = build_documents_from_db(db)
-    if not documents:
-        raise ValueError("No policy sections found to index.")
-    embeddings = get_embeddings()
-    _vector_store = FAISS.from_documents(documents, embeddings)
-    _vector_store.save_local(VECTOR_STORE_PATH)
-    print(f"Built vector store with {len(documents)} documents at {VECTOR_STORE_PATH}")
-    return _vector_store
-
-
-def load_vector_store() -> FAISS:
-    global _vector_store
-    embeddings = get_embeddings()
-    _vector_store = FAISS.load_local(VECTOR_STORE_PATH, embeddings, allow_dangerous_deserialization=True)
-    return _vector_store
-
-
-def get_vector_store() -> FAISS:
-    global _vector_store
-    if _vector_store is None:
-        _vector_store = load_vector_store()
-    return _vector_store
-
-
-def add_document_to_store(section_content: str, metadata: dict):
-    global _vector_store
-    if _vector_store is None:
-        return
-    doc = Document(page_content=section_content, metadata=metadata)
-    _vector_store.add_documents([doc])
-    _vector_store.save_local(VECTOR_STORE_PATH)
+        ))
+    return results

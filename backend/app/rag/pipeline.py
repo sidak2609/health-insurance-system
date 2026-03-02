@@ -4,7 +4,7 @@ import os
 from sqlalchemy.orm import Session
 
 from app.db.models import ChatSession, ChatMessage, Policy, Claim
-from app.rag.ingest import get_vector_store
+from app.rag.ingest import keyword_search
 from app.rag.assessment import EligibilityAssessor, _calculate_personalized_premium
 from app.models.schemas import ChatResponse, CitationItem
 
@@ -145,11 +145,10 @@ def process_chat_message(
     except Exception:
         claims_context = []
 
-    # FAISS similarity search
+    # Keyword search over policy sections (no ML models needed)
     retrieved_docs = []
     try:
-        vector_store = get_vector_store()
-        retrieved_docs = vector_store.similarity_search(message, k=8)
+        retrieved_docs = keyword_search(db, message, k=8)
     except Exception:
         retrieved_docs = []
 
