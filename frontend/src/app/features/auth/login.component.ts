@@ -192,9 +192,9 @@ export class LoginComponent {
         this.isLoading = false;
         const role = response.role;
         if (role === 'insurer') {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/dashboard/overview']);
         } else {
-          this.router.navigate(['/patient/chat']);
+          this.router.navigate(['/patient/claims']);
         }
       },
       error: (err) => {
