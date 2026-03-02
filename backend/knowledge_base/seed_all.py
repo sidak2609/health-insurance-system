@@ -22,7 +22,6 @@ from app.db.models import (
 from app.services.auth_service import hash_password
 from app.services.risk_scoring import calculate_risk_score
 from knowledge_base.seed_policies import POLICIES
-from app.rag.ingest import build_vector_store
 
 
 def seed_all():
@@ -54,10 +53,6 @@ def seed_all():
             print(f"  Created: {policy.name}")
 
         basic, standard, premium = policy_objects
-
-        # Build FAISS vector store
-        print("Building FAISS vector store...")
-        build_vector_store(db)
 
         # ============================================================
         # 2. USERS

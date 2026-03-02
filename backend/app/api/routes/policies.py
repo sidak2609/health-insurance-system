@@ -10,7 +10,6 @@ from app.models.schemas import (
 )
 from app.services.auth_service import get_current_user, require_role
 from app.services.audit_service import log_action
-from app.rag.ingest import build_vector_store
 
 router = APIRouter()
 
@@ -115,12 +114,6 @@ def add_section(
     db.add(section)
     db.commit()
     db.refresh(section)
-
-    # Rebuild FAISS index
-    try:
-        build_vector_store(db)
-    except Exception as e:
-        print(f"Failed to rebuild vector store: {e}")
 
     log_action(db, "section_added", current_user.id, "policy_section", section.id, {
         "policy_id": policy_id, "title": data.section_title,
