@@ -14,7 +14,6 @@ import { NotificationService } from '../../core/services/notification.service';
         <a class="brand" routerLink="/">HealthInsure</a>
         <ul class="nav-links">
           @if (authService.isPatient()) {
-            <li><a routerLink="/patient/chat" routerLinkActive="active">Chat</a></li>
             <li><a routerLink="/patient/claims" routerLinkActive="active">Claims</a></li>
             <li><a routerLink="/patient/premium" routerLinkActive="active">Premium Estimator</a></li>
             <li><a routerLink="/patient/documents" routerLinkActive="active">Documents</a></li>

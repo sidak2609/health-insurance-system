@@ -2,7 +2,7 @@ import json
 
 from sqlalchemy.orm import Session
 
-from app.db.models import ChatSession, ChatMessage, Policy
+from app.db.models import ChatSession, ChatMessage, Policy, Claim
 from app.rag.ingest import get_vector_store
 from app.rag.assessment import EligibilityAssessor
 from app.models.schemas import ChatResponse, CitationItem
@@ -43,6 +43,31 @@ def process_chat_message(
     )
     db.add(user_msg)
     db.commit()
+
+    # Fetch patient's claims for context
+    claims_context = []
+    try:
+        recent_claims = (
+            db.query(Claim)
+            .filter(Claim.patient_id == user_id)
+            .order_by(Claim.created_at.desc())
+            .limit(10)
+            .all()
+        )
+        claims_context = [
+            {
+                "id": c.id,
+                "claim_type": c.claim_type,
+                "amount_claimed": c.amount_claimed,
+                "amount_approved": c.amount_approved,
+                "status": c.status,
+                "description": c.description,
+                "created_at": c.created_at.isoformat() if c.created_at else None,
+            }
+            for c in recent_claims
+        ]
+    except Exception:
+        claims_context = []
 
     # FAISS similarity search
     try:
@@ -103,6 +128,7 @@ def process_chat_message(
         age_check=age_check,
         policy=policy,
         patient_details=patient_details,
+        claims_context=claims_context,
     )
 
     # Build citations

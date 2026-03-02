@@ -11,15 +11,43 @@ KNOWN_CONDITIONS = [
 ]
 
 INTENT_KEYWORDS = {
-    "eligibility": ["eligible", "eligibility", "qualify", "qualification", "can i", "am i"],
-    "coverage": ["cover", "coverage", "covered", "include", "included", "what does", "does it cover"],
-    "exclusion": ["exclude", "exclusion", "not covered", "excluded", "what is not", "what isn't"],
-    "premium": ["premium", "cost", "price", "how much", "monthly", "payment", "afford"],
-    "deductible": ["deductible", "out of pocket", "copay", "co-pay"],
-    "claims": ["claim", "file", "submit", "reimbursement", "reimburse"],
-    "waiting_period": ["waiting period", "pre-existing", "waiting", "how long"],
-    "comparison": ["compare", "comparison", "difference", "better", "vs", "versus", "which plan"],
+    "eligibility": ["eligible", "eligibility", "qualify", "qualification", "can i", "am i", "do i qualify"],
+    "coverage": ["cover", "coverage", "covered", "include", "included", "what does", "does it cover", "is it covered"],
+    "exclusion": ["exclude", "exclusion", "not covered", "excluded", "what is not", "what isn't", "not include"],
+    "premium": ["premium", "cost", "price", "how much", "monthly", "payment", "afford", "rate", "fee"],
+    "deductible": ["deductible", "out of pocket", "copay", "co-pay", "cost sharing"],
+    "claims": ["claim", "file", "submit", "reimbursement", "reimburse", "pending", "my claims", "claim status"],
+    "waiting_period": ["waiting period", "pre-existing", "waiting", "how long", "when can i"],
+    "comparison": ["compare", "comparison", "difference", "better", "vs", "versus", "which plan", "best plan"],
+    "profile": ["my profile", "my conditions", "my age", "my bmi", "my health", "about me", "my details"],
 }
+
+
+def _calculate_personalized_premium(policy, age, bmi, is_smoker) -> tuple[float, list[str]]:
+    """Calculate actual monthly premium for this specific patient."""
+    premium = policy.monthly_premium_base
+    notes = []
+
+    if age:
+        if age > 55:
+            premium *= 1.30
+            notes.append(f"age {age} group (+30%)")
+        elif age > 45:
+            premium *= 1.20
+            notes.append(f"age {age} group (+20%)")
+        elif age > 35:
+            premium *= 1.10
+            notes.append(f"age {age} group (+10%)")
+
+    if is_smoker and policy.smoker_surcharge_pct > 0:
+        premium *= (1 + policy.smoker_surcharge_pct / 100)
+        notes.append(f"smoker surcharge (+{policy.smoker_surcharge_pct:.0f}%)")
+
+    if bmi and bmi > 30 and policy.bmi_surcharge_pct > 0:
+        premium *= (1 + policy.bmi_surcharge_pct / 100)
+        notes.append(f"BMI {bmi:.1f} surcharge (+{policy.bmi_surcharge_pct:.0f}%)")
+
+    return premium, notes
 
 
 class EligibilityAssessor:
@@ -73,9 +101,7 @@ class EligibilityAssessor:
 
         covered_items = []
         excluded_items = []
-        query_lower = query.lower()
 
-        # Check mentioned conditions against coverage/exclusions
         for cond in conditions:
             cond_lower = cond.lower()
             is_excluded = any(cond_lower in exc.lower() for exc in exclusion_list)
@@ -86,7 +112,6 @@ class EligibilityAssessor:
             elif is_covered:
                 covered_items.append(cond)
 
-        # Also scan retrieved sections for coverage info
         section_coverage_info = []
         for section in retrieved_sections:
             content = section.page_content.lower() if hasattr(section, "page_content") else ""
@@ -107,6 +132,37 @@ class EligibilityAssessor:
             "all_exclusions": exclusion_list,
         }
 
+    def _analyze_patient_conditions(self, conditions: list, policy) -> list[dict]:
+        """For each of the patient's pre-existing conditions, determine coverage status."""
+        coverage_list = []
+        try:
+            coverage_list = json.loads(policy.coverage_details or "[]")
+        except (json.JSONDecodeError, TypeError):
+            pass
+
+        exclusion_list = []
+        try:
+            exclusion_list = json.loads(policy.exclusions or "[]")
+        except (json.JSONDecodeError, TypeError):
+            pass
+
+        results = []
+        for cond in conditions:
+            cond_lower = cond.lower()
+            is_excluded = any(cond_lower in exc.lower() for exc in exclusion_list)
+            is_covered = any(cond_lower in cov.lower() for cov in coverage_list)
+
+            if is_excluded:
+                status = "excluded"
+            elif is_covered:
+                status = "covered"
+            else:
+                status = "unknown"
+
+            results.append({"condition": cond, "status": status})
+
+        return results
+
     def generate_response(
         self,
         query: str,
@@ -115,103 +171,192 @@ class EligibilityAssessor:
         age_check: dict,
         policy,
         patient_details: dict = None,
+        claims_context: list = None,
     ) -> tuple[str, list[str]]:
         parts = []
         follow_ups = []
 
-        # Greeting
-        parts.append(f"Based on your query about **{policy.name}** ({policy.plan_type.title()} Plan):\n")
+        pd = patient_details or {}
+        full_name = pd.get("full_name", "")
+        first_name = full_name.split()[0] if full_name else ""
+        age = pd.get("age")
+        bmi = pd.get("bmi")
+        is_smoker = pd.get("is_smoker", False)
+        conditions = pd.get("conditions", [])
 
-        # Age eligibility
+        greeting = f"Hi {first_name}!" if first_name else "Hello!"
+        parts.append(f"{greeting} Here's what I found for you regarding **{policy.name}** ({policy.plan_type.title()} Plan):\n")
+
+        # --- AGE ELIGIBILITY ---
         if "eligibility" in intents and age_check:
-            if age_check["eligible"] is True:
-                parts.append(f"**Age Eligibility:** {age_check['message']}")
-            elif age_check["eligible"] is False:
-                parts.append(f"**Age Eligibility:** {age_check['message']}")
-            else:
-                parts.append(f"**Age Eligibility:** {age_check['message']}")
+            if age_check.get("eligible") is True:
+                parts.append(f"\n✅ **Age Eligibility:** {age_check['message']}")
+            elif age_check.get("eligible") is False:
+                parts.append(f"\n❌ **Age Eligibility:** {age_check['message']}")
 
-        # Coverage results
-        if "coverage" in intents or "exclusion" in intents or coverage_assessment.get("covered") or coverage_assessment.get("excluded"):
+        # --- PERSONALIZED PREMIUM ---
+        if "premium" in intents or "eligibility" in intents or "general" in intents:
+            calc_premium, premium_notes = _calculate_personalized_premium(policy, age, bmi, is_smoker)
+            parts.append(f"\n**Your Estimated Monthly Premium: ${calc_premium:,.2f}**")
+            if premium_notes:
+                parts.append(f"*(Base: ${policy.monthly_premium_base:,.2f}, adjusted for: {', '.join(premium_notes)})*")
+            else:
+                parts.append(f"*(Base rate — no surcharges apply to your profile)*")
+            parts.append(f"- Annual Deductible: ${policy.annual_deductible:,.2f}")
+            parts.append(f"- Max Coverage Limit: ${policy.max_coverage_limit:,.2f}")
+            parts.append(f"- Copay: {policy.copay_percentage:.0f}%")
+
+        # --- DEDUCTIBLE (standalone query) ---
+        elif "deductible" in intents:
+            parts.append(f"\n**Your Cost Sharing:**")
+            parts.append(f"- Annual Deductible: ${policy.annual_deductible:,.2f}")
+            parts.append(f"- Copay: {policy.copay_percentage:.0f}%")
+            parts.append(f"- Max Coverage: ${policy.max_coverage_limit:,.2f}")
+
+        # --- PRE-EXISTING CONDITIONS ANALYSIS ---
+        if conditions and ("eligibility" in intents or "coverage" in intents or "waiting_period" in intents or "general" in intents):
+            condition_analysis = self._analyze_patient_conditions(conditions, policy)
+            parts.append(f"\n**Your Pre-existing Conditions ({len(conditions)} on file):**")
+            for item in condition_analysis:
+                cond_title = item["condition"].title()
+                if item["status"] == "covered":
+                    parts.append(f"- **{cond_title}**: ✅ Covered (subject to {policy.pre_existing_waiting_months}-month waiting period)")
+                elif item["status"] == "excluded":
+                    parts.append(f"- **{cond_title}**: ❌ Not covered under this plan")
+                else:
+                    parts.append(f"- **{cond_title}**: ⚠️ Coverage unconfirmed — contact insurer")
+
+        # --- SPECIFIC COVERAGE QUERY RESULTS ---
+        if coverage_assessment.get("covered") or coverage_assessment.get("excluded"):
             if coverage_assessment.get("covered"):
-                items = ", ".join(coverage_assessment["covered"])
-                parts.append(f"\n**Covered:** {items} are included in this plan's coverage.")
+                items = ", ".join(c.title() for c in coverage_assessment["covered"])
+                parts.append(f"\n✅ **Covered:** {items}")
+                parts.append(f"*(Waiting period: {policy.pre_existing_waiting_months} months for pre-existing conditions)*")
 
             if coverage_assessment.get("excluded"):
-                items = ", ".join(coverage_assessment["excluded"])
-                parts.append(f"\n**Not Covered:** {items} are listed as exclusions for this plan.")
+                items = ", ".join(c.title() for c in coverage_assessment["excluded"])
+                parts.append(f"\n❌ **Not Covered:** {items}")
 
             if coverage_assessment.get("section_matches"):
                 parts.append("\n**Relevant Policy Sections:**")
+                seen_sections = set()
                 for match in coverage_assessment["section_matches"][:3]:
-                    parts.append(f"- *{match['section']}* ({match['policy']}): {match['excerpt'][:150]}...")
+                    key = match["section"]
+                    if key not in seen_sections:
+                        seen_sections.add(key)
+                        parts.append(f"- *{match['section']}* ({match['policy']})")
 
-        # Premium info
-        if "premium" in intents:
-            parts.append(f"\n**Premium Information:**")
-            parts.append(f"- Base Monthly Premium: ${policy.monthly_premium_base:,.2f}")
-            parts.append(f"- Annual Deductible: ${policy.annual_deductible:,.2f}")
-            parts.append(f"- Maximum Coverage: ${policy.max_coverage_limit:,.2f}")
-            parts.append(f"- Copay: {policy.copay_percentage}%")
-            if policy.smoker_surcharge_pct > 0:
-                parts.append(f"- Smoker Surcharge: {policy.smoker_surcharge_pct}%")
-            follow_ups.append("Would you like a personalized premium estimate?")
+        # --- COVERAGE OVERVIEW ---
+        elif "coverage" in intents and not coverage_assessment.get("covered"):
+            all_coverage = coverage_assessment.get("all_coverage", [])
+            all_exclusions = coverage_assessment.get("all_exclusions", [])
+            if all_coverage:
+                parts.append(f"\n**Covered Services:** {', '.join(all_coverage[:8])}")
+            if all_exclusions:
+                parts.append(f"\n**Not Covered:** {', '.join(all_exclusions[:5])}")
 
-        # Deductible info
-        if "deductible" in intents:
-            parts.append(f"\n**Cost Sharing:**")
-            parts.append(f"- Annual Deductible: ${policy.annual_deductible:,.2f}")
-            parts.append(f"- Copay Percentage: {policy.copay_percentage}%")
+        # --- EXCLUSIONS ---
+        if "exclusion" in intents:
+            all_exclusions = coverage_assessment.get("all_exclusions", [])
+            if all_exclusions:
+                parts.append(f"\n**Plan Exclusions:**")
+                for exc in all_exclusions[:8]:
+                    parts.append(f"- {exc}")
 
-        # Claims info
-        if "claims" in intents:
-            parts.append(f"\n**Claims Process:** You can submit claims through the claims portal. "
-                        f"Each claim will be assessed based on your policy coverage and risk profile.")
-            follow_ups.append("Would you like to submit a new claim?")
-
-        # Waiting period
+        # --- WAITING PERIOD ---
         if "waiting_period" in intents:
-            parts.append(f"\n**Waiting Period:** This plan has a {policy.pre_existing_waiting_months}-month "
-                        f"waiting period for pre-existing conditions.")
+            parts.append(f"\n**Waiting Period:** This plan has a **{policy.pre_existing_waiting_months}-month** waiting period for pre-existing conditions.")
+            if conditions:
+                parts.append(f"This applies to your conditions: {', '.join(c.title() for c in conditions)}.")
 
-        # Comparison
+        # --- CLAIMS CONTEXT ---
+        if claims_context:
+            pending = [c for c in claims_context if c["status"] == "pending"]
+            approved = [c for c in claims_context if c["status"] == "approved"]
+            rejected = [c for c in claims_context if c["status"] == "rejected"]
+
+            if "claims" in intents or any(kw in query.lower() for kw in ["my claim", "claim status", "pending"]):
+                parts.append(f"\n**Your Claims Summary:**")
+                if pending:
+                    parts.append(f"- **{len(pending)} Pending** — currently under review:")
+                    for c in pending[:3]:
+                        parts.append(f"  - Claim #{c['id']} ({c['claim_type'].title()}): ${c['amount_claimed']:,.2f} claimed")
+                if approved:
+                    total = sum(c.get("amount_approved") or 0 for c in approved)
+                    parts.append(f"- **{len(approved)} Approved** — ${total:,.2f} total approved")
+                if rejected:
+                    parts.append(f"- **{len(rejected)} Rejected** on record")
+                if not claims_context:
+                    parts.append(f"- No claims filed yet")
+                follow_ups.append("How do I check the details of a specific claim?")
+            elif pending:
+                parts.append(f"\n**Active Claims:** You have **{len(pending)} pending claim(s)** under review.")
+
+        # --- PLAN COMPARISON ---
         if "comparison" in intents:
             parts.append(f"\n**Plan Comparison:** Use the Premium Estimator to compare costs across all available plans.")
-            follow_ups.append("Would you like to compare this plan with other available plans?")
+            follow_ups.append("How does this plan compare to premium-tier plans?")
 
-        # General fallback
-        if "general" in intents and len(parts) == 1:
+        # --- SMOKER & BMI NOTES (when not already shown in premium section) ---
+        if is_smoker and policy.smoker_surcharge_pct > 0 and "premium" not in intents and "general" not in intents:
+            parts.append(f"\n**Smoker Note:** A {policy.smoker_surcharge_pct:.0f}% premium surcharge applies to your profile.")
+            follow_ups.append("How much would I save on premiums if I quit smoking?")
+
+        if bmi and bmi > 30 and policy.bmi_surcharge_pct > 0 and "premium" not in intents and "general" not in intents:
+            parts.append(f"\n**BMI Note:** Your BMI of {bmi:.1f} triggers a {policy.bmi_surcharge_pct:.0f}% surcharge on your base premium.")
+
+        # --- GENERAL FALLBACK ---
+        if "general" in intents and len(parts) <= 2:
+            calc_premium, premium_notes = _calculate_personalized_premium(policy, age, bmi, is_smoker)
             parts.append(f"\n**Plan Overview:**")
-            parts.append(f"- Monthly Premium: ${policy.monthly_premium_base:,.2f}")
-            parts.append(f"- Deductible: ${policy.annual_deductible:,.2f}")
+            parts.append(f"- Your Monthly Premium: **${calc_premium:,.2f}**")
+            if premium_notes:
+                parts.append(f"  *(adjusted for {', '.join(premium_notes)})*")
+            parts.append(f"- Annual Deductible: ${policy.annual_deductible:,.2f}")
             parts.append(f"- Max Coverage: ${policy.max_coverage_limit:,.2f}")
-            parts.append(f"- Copay: {policy.copay_percentage}%")
-            parts.append(f"- Age Range: {policy.age_min}-{policy.age_max}")
+            parts.append(f"- Copay: {policy.copay_percentage:.0f}%")
+            parts.append(f"- Eligible Age Range: {policy.age_min}–{policy.age_max}")
 
-            coverage = coverage_assessment.get("all_coverage", [])
-            if coverage:
-                parts.append(f"\n**Covered Services:** {', '.join(coverage[:8])}")
+            all_coverage = coverage_assessment.get("all_coverage", [])
+            if all_coverage:
+                parts.append(f"\n**Covered Services:** {', '.join(all_coverage[:8])}")
 
-            exclusions = coverage_assessment.get("all_exclusions", [])
-            if exclusions:
-                parts.append(f"\n**Exclusions:** {', '.join(exclusions[:5])}")
+            all_exclusions = coverage_assessment.get("all_exclusions", [])
+            if all_exclusions:
+                parts.append(f"\n**Exclusions:** {', '.join(all_exclusions[:5])}")
 
-        # Patient-specific notes
-        if patient_details:
-            smoker = patient_details.get("is_smoker", False)
-            conditions = patient_details.get("conditions", [])
-            if smoker and policy.smoker_surcharge_pct > 0:
-                parts.append(f"\n**Note:** As a smoker, a {policy.smoker_surcharge_pct}% surcharge applies to your premium.")
             if conditions:
-                parts.append(f"\n**Note:** You have listed pre-existing conditions: {', '.join(conditions)}. "
-                           f"A {policy.pre_existing_waiting_months}-month waiting period may apply.")
+                condition_analysis = self._analyze_patient_conditions(conditions, policy)
+                parts.append(f"\n**Your Conditions:**")
+                for item in condition_analysis:
+                    cond_title = item["condition"].title()
+                    if item["status"] == "covered":
+                        parts.append(f"- {cond_title}: ✅ Covered (after {policy.pre_existing_waiting_months}-month wait)")
+                    elif item["status"] == "excluded":
+                        parts.append(f"- {cond_title}: ❌ Excluded")
+                    else:
+                        parts.append(f"- {cond_title}: ⚠️ Verify with insurer")
 
-        # Default follow-ups
+        # --- SMART FOLLOW-UPS BASED ON PATIENT PROFILE ---
         if not follow_ups:
-            follow_ups = [
-                "What specific conditions would you like to check coverage for?",
-                "Would you like to see the premium breakdown for this plan?",
-                "Would you like to compare this with other available plans?",
-            ]
+            if conditions:
+                follow_ups.append(f"Is my {conditions[0].title()} treatment fully covered?")
+                if len(conditions) > 1:
+                    follow_ups.append(f"How long is the waiting period for {conditions[1].title()}?")
+            if is_smoker:
+                follow_ups.append("How does smoking affect my eligibility and premium?")
+            if claims_context and any(c["status"] == "pending" for c in claims_context):
+                follow_ups.append("What's the status of my pending claims?")
+            if "premium" not in intents:
+                follow_ups.append("What is my personalized monthly premium?")
+            follow_ups.append("How do I submit a new claim?")
 
-        return "\n".join(parts), follow_ups
+        # Deduplicate and cap
+        seen_fu = set()
+        unique_follow_ups = []
+        for fu in follow_ups:
+            if fu not in seen_fu:
+                seen_fu.add(fu)
+                unique_follow_ups.append(fu)
+
+        return "\n".join(parts), unique_follow_ups[:4]

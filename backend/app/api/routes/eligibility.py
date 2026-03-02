@@ -21,6 +21,7 @@ def send_message(
     current_user: User = Depends(get_current_user),
 ):
     patient_details = {
+        "full_name": current_user.full_name,
         "age": current_user.age,
         "bmi": current_user.bmi,
         "is_smoker": current_user.is_smoker,

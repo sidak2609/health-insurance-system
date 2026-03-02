@@ -15,7 +15,7 @@ export const routes: Routes = [
     path: 'patient',
     canActivate: [authGuard],
     children: [
-      { path: '', redirectTo: 'chat', pathMatch: 'full' },
+      { path: '', redirectTo: 'claims', pathMatch: 'full' },
       {
         path: 'chat',
         loadComponent: () => import('./features/patient-portal/chat/chat.component').then(m => m.ChatComponent),
