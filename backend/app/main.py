@@ -41,17 +41,13 @@ async def lifespan(app: FastAPI):
 
     db = SessionLocal()
     try:
-        if db.query(Policy).count() == 0:
-            print("Empty database detected. Running seed...")
+        # Always run seed — it upserts policies/sections and is safe to re-run.
+        # This ensures new knowledge base sections are applied on every deploy.
+        try:
             from knowledge_base.seed_policies import seed
             seed()
-        else:
-            try:
-                from app.rag.ingest import build_vector_store
-                build_vector_store(db)
-                print("FAISS vector store rebuilt from existing data.")
-            except Exception as e:
-                print(f"Failed to build vector store: {e}")
+        except Exception as e:
+            print(f"Seed failed: {e}")
 
         _seed_demo_users(db)
     finally:

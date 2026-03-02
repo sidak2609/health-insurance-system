@@ -1196,8 +1196,12 @@ def seed():
                 else:
                     print(f"{policy.name}: updated existing sections")
 
-        print("Building FAISS vector store...")
-        build_vector_store(db)
+        try:
+            print("Building FAISS vector store...")
+            build_vector_store(db)
+            print("Vector store built successfully.")
+        except Exception as e:
+            print(f"Warning: Could not build vector store: {e}")
         print("Seed/update complete!")
     finally:
         db.close()
