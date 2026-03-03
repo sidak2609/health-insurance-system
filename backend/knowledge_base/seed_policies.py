@@ -1128,6 +1128,820 @@ A: Yes, both conditions are covered after the 3-month waiting period. You will h
             },
         ],
     },
+
+    # ─────────────────────────────────────────────────────────────
+    # POLICY 4: SENIOR CARE PLAN
+    # ─────────────────────────────────────────────────────────────
+    {
+        "name": "Senior Care Plan",
+        "plan_type": "senior",
+        "monthly_premium_base": 8000.00,
+        "annual_deductible": 10000.00,
+        "max_coverage_limit": 2000000.00,
+        "copay_percentage": 15.0,
+        "coverage_details": json.dumps([
+            "Comprehensive hospitalization (private room)",
+            "Specialist consultations (unlimited)",
+            "Chronic disease management (diabetes, hypertension, arthritis, COPD)",
+            "Cataract surgery and eye care",
+            "Orthopaedic procedures and joint replacement",
+            "Cardiac care and bypass surgery",
+            "Dialysis and kidney care",
+            "Cancer treatment (chemotherapy, radiation, surgery)",
+            "Prescription medications (brand and generic)",
+            "Home nursing care (up to 30 days/year)",
+            "Physiotherapy (up to 48 sessions/year)",
+            "Ambulance services (air and ground)",
+            "Annual health check-up package",
+            "Dental care (basic and major)",
+            "Hearing aids and audiology",
+            "Mental health and geriatric psychiatry",
+            "Domiciliary hospitalization",
+        ]),
+        "exclusions": json.dumps([
+            "Cosmetic surgery",
+            "Fertility treatments",
+            "Experimental treatments not approved by DCGI",
+            "Self-inflicted injuries",
+            "War or nuclear hazard-related injuries",
+            "Vitamin and supplement costs",
+        ]),
+        "age_min": 55,
+        "age_max": 80,
+        "smoker_surcharge_pct": 30.0,
+        "bmi_surcharge_pct": 10.0,
+        "pre_existing_waiting_months": 3,
+        "sections": [
+            {
+                "section_title": "Eligibility Requirements — Senior Care Plan",
+                "section_number": 1,
+                "keywords": json.dumps(["eligibility", "age", "senior", "elderly", "qualify", "55", "60", "65"]),
+                "section_content": """Senior Care Plan — Eligibility Requirements
+
+WHO CAN ENROLL:
+- Age: 55 to 80 years at time of enrollment
+- Indian resident with valid government ID
+- Medical underwriting required for applicants above 70
+
+ENROLLMENT:
+- Open enrollment in April and October each year
+- Existing members may renew up to age 85 if continuously enrolled
+- Family members (spouse) aged 50+ may be added at a 10% discount
+- No medical examination required for ages 55-65 on initial enrollment
+
+WAITING PERIODS:
+- Pre-existing conditions: 3-month waiting period (shortest of all plans)
+- New illnesses: 30-day waiting period
+- Specific procedures (joint replacement, cataract): immediate coverage
+- Cancer treatment: 60-day waiting period if not pre-existing""",
+            },
+            {
+                "section_title": "Covered Services — Senior Care Plan",
+                "section_number": 2,
+                "keywords": json.dumps(["covered", "benefits", "hospitalization", "surgery", "specialist", "dialysis", "cancer", "cardiac"]),
+                "section_content": """Senior Care Plan — Covered Services
+
+HOSPITALIZATION:
+- Private room: covered in full after deductible
+- ICU and critical care: fully covered
+- Domiciliary hospitalization (home treatment): up to Rs 50,000/year
+- Day care procedures: fully covered (300+ listed procedures)
+
+CHRONIC DISEASE MANAGEMENT:
+- Diabetes: HbA1c tests, insulin, oral medications, dietitian visits
+- Hypertension: BP monitoring, cardiac workup, medications
+- Arthritis: rheumatologist visits, physiotherapy, DMARDs
+- COPD: pulmonology consultations, nebulization, spirometry
+- All chronic disease medications: covered with no annual cap
+
+MAJOR PROCEDURES:
+- Cardiac bypass (CABG): covered up to Rs 8,00,000
+- Knee or hip replacement: covered up to Rs 4,00,000
+- Cataract surgery: Rs 30,000 per eye, both eyes per year
+- Dialysis: Rs 3,000 per session, unlimited sessions
+- Cancer surgery: covered in full
+- Chemotherapy: covered (Rs 2,00,000 per year)
+- Radiation therapy: covered in full
+
+DIAGNOSTICS AND PHARMACY:
+- All DCGI-approved medications (brand and generic): covered
+- MRI, CT scan, PET scan: fully covered when prescribed
+- Pathology and blood work: fully covered
+- Annual comprehensive health check (Rs 8,000 value): free each year""",
+            },
+            {
+                "section_title": "Premiums and Cost Sharing — Senior Care Plan",
+                "section_number": 3,
+                "keywords": json.dumps(["premium", "cost", "deductible", "copay", "surcharge", "bmi", "smoker", "price", "monthly"]),
+                "section_content": """Senior Care Plan — Premiums and Cost Sharing
+
+BASE MONTHLY PREMIUM:
+- Age 55-60: Rs 8,000/month
+- Age 61-65: Rs 9,500/month (automatic age tier adjustment)
+- Age 66-70: Rs 11,000/month
+- Age 71-80: Rs 13,500/month
+
+SURCHARGES (applied on top of base premium):
+- Smoker surcharge: 30% additional
+- BMI > 30: 10% additional
+- BMI > 35: 20% additional
+
+DEDUCTIBLE: Rs 10,000 per policy year (lowest of all plans)
+COPAY: 15% of approved claim amount
+OUT-OF-POCKET MAXIMUM: Rs 75,000 per year (after which plan pays 100%)
+MAXIMUM COVERAGE: Rs 20,00,000 per policy year
+
+EXAMPLE:
+- 65-year-old non-smoker, BMI 26: Rs 9,500/month
+- 65-year-old smoker, BMI 33: Rs 9,500 × 1.30 × 1.10 = Rs 13,585/month""",
+            },
+            {
+                "section_title": "Pre-Existing Conditions — Senior Care Plan",
+                "section_number": 4,
+                "keywords": json.dumps(["pre-existing", "diabetes", "hypertension", "arthritis", "heart", "kidney", "COPD", "cancer", "waiting period", "covered"]),
+                "section_content": """Senior Care Plan — Pre-Existing Conditions Coverage
+
+WAITING PERIOD: Only 3 months for all pre-existing conditions.
+
+COVERED PRE-EXISTING CONDITIONS:
+- Diabetes mellitus (Type 1 and Type 2): medications, consultations, monitoring
+- Hypertension: medications, cardiac monitoring, lifestyle programs
+- Arthritis (osteoarthritis and rheumatoid): physiotherapy, medications, surgery
+- Heart disease / coronary artery disease: medications, cardiac procedures
+- COPD / chronic bronchitis: inhalers, nebulizers, pulmonology care
+- Chronic kidney disease: dialysis, nephrology consultations
+- Thyroid disorders: medications, endocrinology consultations
+- Parkinson's disease: neurologist visits, medications
+- Cataract and glaucoma: surgery, ophthalmology consultations
+
+CANCER COVERAGE:
+- Pre-existing cancer (in remission > 2 years): covered after 60-day waiting period
+- Newly diagnosed cancer: covered immediately after 60-day general waiting period
+- Includes: surgery, chemotherapy, radiation, immunotherapy, palliative care
+
+SPECIFIC EXCLUSIONS UNDER PRE-EXISTING:
+- Conditions not disclosed at enrollment may not be covered
+- Congenital conditions: not covered""",
+            },
+            {
+                "section_title": "Home Care and Physiotherapy — Senior Care Plan",
+                "section_number": 5,
+                "keywords": json.dumps(["home care", "nursing", "physiotherapy", "domiciliary", "rehabilitation", "physio"]),
+                "section_content": """Senior Care Plan — Home Care and Physiotherapy
+
+HOME NURSING CARE:
+- Up to 30 days per year of certified home nursing
+- Covered conditions: post-surgical recovery, stroke rehabilitation, advanced diabetes care
+- Rate: Rs 1,500 per nursing visit (up to 2 visits/day)
+- Requires physician prescription and pre-authorization
+- Applicable when hospitalization is not medically necessary but home monitoring is required
+
+PHYSIOTHERAPY:
+- Up to 48 sessions per policy year
+- Covered for: post-surgery recovery, arthritis, back pain, stroke rehabilitation, COPD
+- Rs 800 per session at empanelled centres
+- Home physiotherapy: Rs 1,200 per session (up to 20 sessions/year)
+
+OCCUPATIONAL THERAPY:
+- Up to 20 sessions/year for post-stroke, Parkinson's, or fall prevention
+- Rs 900 per session
+
+DENTAL CARE:
+- Annual dental check-up: Rs 1,500
+- Fillings and extractions: Rs 5,000/year
+- Root canal treatment: Rs 8,000 per tooth, up to 2 per year
+- Dentures and crowns: Rs 15,000/year
+- Implants: NOT covered
+
+HEARING AIDS:
+- One hearing aid per ear every 3 years: up to Rs 20,000 per device
+- Audiological assessment: fully covered once per year""",
+            },
+            {
+                "section_title": "Claims Process — Senior Care Plan",
+                "section_number": 6,
+                "keywords": json.dumps(["claim", "submit", "reimbursement", "cashless", "hospital", "process", "documents", "pre-authorization"]),
+                "section_content": """Senior Care Plan — Claims Process
+
+CASHLESS HOSPITALIZATION:
+- Available at 8,000+ network hospitals across India
+- Senior Care card must be presented at hospital admission
+- Hospital contacts TPA (Third Party Administrator) directly
+- Pre-authorization within 4 hours for planned procedures
+- Emergency cashless within 2 hours of intimation
+
+HOW TO SUBMIT A REIMBURSEMENT CLAIM:
+1. Notify us within 48 hours of any hospitalization
+2. Collect all original bills, discharge summary, and prescriptions
+3. Submit via HealthInsure app, portal, or email within 30 days
+4. Required documents:
+   - Original hospital bills and receipts
+   - Discharge summary / doctor's certificate
+   - Prescription copies for medications
+   - Lab/diagnostic reports
+   - Pre-authorization reference number (if obtained)
+5. Reimbursement within 10 working days
+
+CLAIM LIMITS:
+- No sub-limits for room rent (private room fully covered)
+- No sub-limits for ICU
+- Surgery charges covered in full up to policy maximum
+- Pharmacy: up to Rs 50,000/year without hospitalization
+
+SENIOR ASSISTANCE HELPLINE: 1800-425-CARE (24/7)""",
+            },
+            {
+                "section_title": "Frequently Asked Questions — Senior Care Plan",
+                "section_number": 7,
+                "keywords": json.dumps(["faq", "question", "answer", "query", "help", "how", "what", "when", "why"]),
+                "section_content": """Senior Care Plan — Frequently Asked Questions
+
+Q: I am 72 years old. Can I enroll?
+A: Yes. Enrollment is open up to age 80. A medical examination will be required.
+
+Q: I have diabetes and underwent knee surgery 2 years ago. Are these covered?
+A: Both are covered after the 3-month waiting period. The knee surgery would be covered for any follow-up care or future surgeries.
+
+Q: What is my out-of-pocket maximum?
+A: Rs 75,000 per year. After that, the plan covers 100% of approved expenses.
+
+Q: Does the plan cover my dialysis three times a week?
+A: Yes. Dialysis is covered at Rs 3,000 per session with no session limit.
+
+Q: I need a hip replacement. Do I need pre-authorization?
+A: Yes, for planned surgeries. Submit the request at least 7 days before the procedure. Emergency surgeries are covered without prior authorization.
+
+Q: Will my plan renew automatically?
+A: Yes, subject to premium payment. Renewal is guaranteed up to age 85 for members who enrolled before age 75.
+
+Q: My spouse is 52. Can she join the Senior Care Plan?
+A: Yes. Spouses aged 50+ can join at a 10% discount on the standard premium.""",
+            },
+        ],
+    },
+
+    # ─────────────────────────────────────────────────────────────
+    # POLICY 5: MATERNITY PLUS PLAN
+    # ─────────────────────────────────────────────────────────────
+    {
+        "name": "Maternity Plus Plan",
+        "plan_type": "maternity",
+        "monthly_premium_base": 5000.00,
+        "annual_deductible": 15000.00,
+        "max_coverage_limit": 1500000.00,
+        "copay_percentage": 20.0,
+        "coverage_details": json.dumps([
+            "Normal delivery (up to Rs 50,000)",
+            "Caesarean section delivery (up to Rs 90,000)",
+            "Pre-natal consultations and tests (all trimesters)",
+            "Post-natal care (up to 60 days)",
+            "Newborn baby coverage (from day 1, up to Rs 50,000 first year)",
+            "Complications of pregnancy (ectopic, miscarriage, placenta previa)",
+            "NICU coverage for premature or sick newborns",
+            "Infertility workup (diagnostics only)",
+            "Gynaecology consultations (unlimited)",
+            "Vaccinations for newborn (first year)",
+            "Lactation support and nutrition counselling",
+            "Mental health: post-partum depression coverage",
+        ]),
+        "exclusions": json.dumps([
+            "IVF and assisted reproductive technology (ART)",
+            "Surrogacy-related expenses",
+            "MTP (abortion) unless medically indicated",
+            "Pre-existing gynaecological conditions in first policy year",
+            "Cosmetic procedures",
+            "Non-essential elective procedures during pregnancy",
+        ]),
+        "age_min": 18,
+        "age_max": 45,
+        "smoker_surcharge_pct": 20.0,
+        "bmi_surcharge_pct": 10.0,
+        "pre_existing_waiting_months": 9,
+        "sections": [
+            {
+                "section_title": "Eligibility — Maternity Plus Plan",
+                "section_number": 1,
+                "keywords": json.dumps(["eligibility", "maternity", "pregnancy", "age", "woman", "enroll", "qualify"]),
+                "section_content": """Maternity Plus Plan — Eligibility Requirements
+
+WHO CAN ENROLL:
+- Women aged 18 to 45 years
+- Must be enrolled at least 9 months before pregnancy for maternity benefits
+- Spouses can be covered as dependents for general health benefits
+- Valid for both first-time and subsequent pregnancies
+
+WAITING PERIOD:
+- Maternity (delivery, pre/post-natal): 9-month waiting period from enrollment
+- Complications of pregnancy: covered from month 3 of enrollment
+- Newborn care: covered from day 1 of birth
+- General illness: 30-day waiting period
+
+NOTE: This plan is designed to be enrolled before conception. Women already pregnant at time of enrollment may access general health benefits but maternity benefits require the 9-month waiting period.""",
+            },
+            {
+                "section_title": "Maternity and Delivery Coverage",
+                "section_number": 2,
+                "keywords": json.dumps(["delivery", "normal", "caesarean", "c-section", "maternity", "birth", "hospital", "prenatal", "postnatal"]),
+                "section_content": """Maternity Plus Plan — Delivery and Maternity Coverage
+
+NORMAL DELIVERY:
+- Hospitalization costs: up to Rs 50,000
+- Includes room charges (semi-private), OT charges, nursing
+- Anaesthesia for assisted delivery: covered
+- Up to 3 days hospitalization post-delivery
+
+CAESAREAN SECTION:
+- Total hospitalization: up to Rs 90,000
+- OT charges, anaesthesia, surgeon fee: included
+- Up to 5 days hospitalization post-C-section
+
+PRE-NATAL CARE (all three trimesters):
+- Gynaecologist consultations: unlimited (Rs 500 copay per visit)
+- Blood tests: CBC, blood group, thyroid, glucose tolerance: covered
+- Ultrasound scans: 4 scans per pregnancy (anomaly, dating, growth, delivery)
+- NIPT and amniocentesis: covered when medically indicated (Rs 8,000)
+- Iron, folic acid, and calcium supplements: Rs 2,000/month covered
+
+POST-NATAL CARE (60 days after delivery):
+- Follow-up consultations: 3 visits covered
+- Breastfeeding/lactation consultant: 2 visits covered
+- Post-partum depression screening and therapy: up to 8 sessions
+
+COMPLICATIONS OF PREGNANCY:
+- Ectopic pregnancy: fully covered
+- Miscarriage (medical management): covered
+- Pre-eclampsia and eclampsia: ICU and treatment fully covered
+- Gestational diabetes management: fully covered
+- Placenta previa: surgery covered""",
+            },
+            {
+                "section_title": "Newborn and NICU Coverage",
+                "section_number": 3,
+                "keywords": json.dumps(["newborn", "baby", "NICU", "infant", "premature", "neonatal", "vaccination", "child"]),
+                "section_content": """Maternity Plus Plan — Newborn and NICU Coverage
+
+NEWBORN COVERAGE:
+- Newborn is covered from day 1 of birth under the mother's policy
+- First-year coverage: up to Rs 50,000
+- After age 1: must be separately enrolled in a children's health plan
+
+NICU (Neonatal Intensive Care Unit):
+- Premature birth (before 37 weeks): NICU covered up to Rs 1,50,000
+- Low birth weight (< 2.5 kg): NICU covered up to Rs 1,00,000
+- Respiratory distress syndrome: ventilator care fully covered
+- Neonatal jaundice (phototherapy): covered
+- Neonatal surgery: covered up to Rs 2,00,000
+
+NEWBORN VACCINATIONS (first year):
+- BCG, Hepatitis B, OPV, DPT, Hib, Rotavirus, PCV, MMR, Varicella
+- All vaccines on the national immunization schedule: fully covered
+- Optional vaccines (Meningococcal, Typhoid): covered up to Rs 3,000
+
+PAEDIATRIC CONSULTATIONS:
+- 6 well-baby check-ups in first year: fully covered
+- Any illness consultations: covered under standard benefits""",
+            },
+            {
+                "section_title": "Claims Process — Maternity Plus Plan",
+                "section_number": 4,
+                "keywords": json.dumps(["claim", "submit", "cashless", "reimbursement", "process", "documents", "hospital"]),
+                "section_content": """Maternity Plus Plan — Claims Process
+
+CASHLESS DELIVERY:
+1. Inform us (or TPA) at least 7 days before planned delivery
+2. Present your Maternity Plus card at admission
+3. Hospital raises pre-authorization with TPA
+4. Approval within 2 hours (emergency within 30 minutes)
+5. All covered expenses settled directly with hospital
+
+REIMBURSEMENT CLAIM (if cashless not used):
+1. Notify within 48 hours of delivery
+2. Submit within 45 days of discharge
+3. Required documents:
+   - Hospital discharge summary
+   - Delivery notes / OT notes
+   - All original bills
+   - Birth certificate copy
+   - Prescription for medications
+4. Reimbursement within 10 business days
+
+HELPLINE: 1800-MATERNITY (1800-628-3776) available 24/7""",
+            },
+            {
+                "section_title": "Frequently Asked Questions — Maternity Plus Plan",
+                "section_number": 5,
+                "keywords": json.dumps(["faq", "question", "answer", "pregnant", "delivery", "ivf", "c-section", "normal", "complications"]),
+                "section_content": """Maternity Plus Plan — Frequently Asked Questions
+
+Q: I am currently 3 months pregnant. Can I enroll and claim for delivery?
+A: You can enroll, but the 9-month maternity waiting period means delivery won't be covered. You will have coverage for complications from month 3 of enrollment.
+
+Q: Is IVF covered?
+A: No. Assisted reproductive technology (ART), including IVF, ICSI, and surrogacy, is not covered.
+
+Q: My baby was born premature and is in the NICU. Is that covered?
+A: Yes. NICU care for premature infants is covered up to Rs 1,50,000.
+
+Q: Does the plan cover twins?
+A: Yes. Both babies are covered under the newborn benefit. NICU limits apply per baby.
+
+Q: I had a miscarriage at 10 weeks. Is the D&C procedure covered?
+A: Yes. Miscarriage management (D&C or medical) is covered from the third month of enrollment.
+
+Q: Can my husband be added to this plan?
+A: Yes, as a general health dependent (non-maternity benefits). His premium is calculated based on age and health profile.""",
+            },
+        ],
+    },
+
+    # ─────────────────────────────────────────────────────────────
+    # POLICY 6: CRITICAL ILLNESS SHIELD
+    # ─────────────────────────────────────────────────────────────
+    {
+        "name": "Critical Illness Shield",
+        "plan_type": "critical",
+        "monthly_premium_base": 3500.00,
+        "annual_deductible": 0.00,
+        "max_coverage_limit": 5000000.00,
+        "copay_percentage": 0.0,
+        "coverage_details": json.dumps([
+            "Cancer (all stages) — lump sum payout",
+            "Heart attack (myocardial infarction) — lump sum payout",
+            "Stroke with permanent neurological damage — lump sum payout",
+            "Kidney failure (end-stage renal disease) — lump sum payout",
+            "Major organ transplant (heart, liver, kidney, lung) — lump sum payout",
+            "Coronary artery bypass surgery (CABG) — lump sum payout",
+            "Paralysis (two or more limbs, permanent) — lump sum payout",
+            "Multiple sclerosis — lump sum payout",
+            "Motor neurone disease — lump sum payout",
+            "Aorta graft surgery — lump sum payout",
+            "Primary pulmonary hypertension — lump sum payout",
+            "30-day survival clause then full lump sum paid",
+        ]),
+        "exclusions": json.dumps([
+            "Pre-existing critical illnesses (covered after 90-day waiting period)",
+            "Death within 30 days of diagnosis (survival clause applies)",
+            "Self-inflicted injuries or suicide attempt",
+            "HIV/AIDS-related critical illness",
+            "War or nuclear hazard",
+            "Alcohol or drug-induced critical illness",
+            "Non-invasive cancers (CIS) unless invasive surgery required",
+        ]),
+        "age_min": 18,
+        "age_max": 65,
+        "smoker_surcharge_pct": 40.0,
+        "bmi_surcharge_pct": 15.0,
+        "pre_existing_waiting_months": 3,
+        "sections": [
+            {
+                "section_title": "How Critical Illness Shield Works",
+                "section_number": 1,
+                "keywords": json.dumps(["how it works", "lump sum", "payout", "benefit", "critical illness", "claim", "diagnosis"]),
+                "section_content": """Critical Illness Shield — How It Works
+
+LUMP SUM BENEFIT:
+- Upon diagnosis of a covered critical illness AND surviving 30 days after diagnosis, a lump sum of up to Rs 50,00,000 is paid directly to you.
+- The benefit is paid regardless of actual medical expenses incurred.
+- You can use the money for treatment, loan repayment, living expenses, or any purpose.
+
+PAYOUT TIERS:
+- Cancer (Stage 3 or 4): 100% of sum insured
+- Cancer (Stage 1 or 2): 50% of sum insured
+- Heart attack, stroke, kidney failure, transplant: 100%
+- CABG, aorta surgery: 75%
+- Multiple sclerosis, motor neurone disease: 100%
+- Paralysis (permanent): 100%
+
+SURVIVAL CLAUSE:
+- You must survive 30 days after the date of diagnosis to receive the payout.
+- This prevents minor incidents from triggering payouts.
+
+THIS PLAN WORKS BEST IN COMBINATION with a regular hospitalization plan (Basic, Standard, or Premium Plan) to cover day-to-day hospital expenses.""",
+            },
+            {
+                "section_title": "Covered Critical Illnesses",
+                "section_number": 2,
+                "keywords": json.dumps(["cancer", "heart attack", "stroke", "kidney failure", "transplant", "bypass", "CABG", "paralysis", "covered conditions"]),
+                "section_content": """Critical Illness Shield — Covered Conditions
+
+1. CANCER:
+   - All malignant cancers with histological confirmation
+   - Stage 1-2: 50% payout; Stage 3-4: 100% payout
+   - Blood cancers (leukemia, lymphoma): included
+   - Skin cancer (invasive): included; Non-melanoma skin cancer: excluded
+
+2. HEART ATTACK:
+   - Myocardial infarction confirmed by ECG changes and troponin elevation
+   - Left ventricular ejection fraction < 50% required
+
+3. STROKE:
+   - Cerebrovascular accident with permanent neurological deficit lasting > 3 months
+   - TIA (transient ischemic attack): NOT covered
+
+4. KIDNEY FAILURE:
+   - End-stage renal disease requiring permanent dialysis or transplant
+   - Both kidneys must be affected
+
+5. MAJOR ORGAN TRANSPLANT:
+   - Heart, liver, kidney, lung, or bone marrow transplant
+   - Corneal transplant: not included
+
+6. CORONARY ARTERY BYPASS (CABG):
+   - Open heart surgery to bypass one or more blocked coronary arteries
+   - Angioplasty alone: not covered
+
+7. PARALYSIS:
+   - Permanent loss of use of two or more limbs for > 6 months
+   - Paraplegia and quadriplegia included
+
+8. MULTIPLE SCLEROSIS:
+   - Confirmed by MRI and neurologist; symptoms present > 6 months
+
+9. MOTOR NEURONE DISEASE:
+   - ALS and similar progressive conditions confirmed by neurologist
+
+10. AORTA GRAFT SURGERY:
+    - Surgery requiring cardiopulmonary bypass to repair aorta""",
+            },
+            {
+                "section_title": "Premiums — Critical Illness Shield",
+                "section_number": 3,
+                "keywords": json.dumps(["premium", "cost", "price", "monthly", "surcharge", "smoker", "bmi", "age"]),
+                "section_content": """Critical Illness Shield — Premiums
+
+BASE MONTHLY PREMIUM:
+- Age 18-35: Rs 3,500/month (sum insured Rs 50,00,000)
+- Age 36-45: Rs 5,200/month
+- Age 46-55: Rs 7,800/month
+- Age 56-65: Rs 11,500/month
+
+SURCHARGES:
+- Smoker: 40% surcharge (highest of all plans due to cancer/cardiac risk)
+- BMI 30-35: 15% surcharge
+- BMI > 35: 25% surcharge
+- Family history of cancer or cardiac disease: 10% loading
+
+DEDUCTIBLE: Rs 0 (lump sum plans have no deductible)
+COPAY: 0% (lump sum paid in full)
+
+EXAMPLE:
+- 40-year-old non-smoker, BMI 24: Rs 5,200/month
+- 40-year-old smoker, BMI 32: Rs 5,200 × 1.40 × 1.15 = Rs 8,372/month
+
+SUM INSURED OPTIONS:
+- Rs 10,00,000 / Rs 25,00,000 / Rs 50,00,000 (select at enrollment)""",
+            },
+            {
+                "section_title": "How to Claim — Critical Illness Shield",
+                "section_number": 4,
+                "keywords": json.dumps(["claim", "process", "diagnosis", "documents", "payout", "submit", "how to claim"]),
+                "section_content": """Critical Illness Shield — Claiming Benefits
+
+STEP-BY-STEP CLAIM PROCESS:
+
+1. NOTIFICATION (within 30 days of diagnosis):
+   - Call 1800-CRITICAL or submit via app
+   - Provide diagnosis details and doctor information
+
+2. SURVIVAL PERIOD:
+   - Wait 30 days from date of diagnosis
+   - No claim can be filed before the 30-day survival period ends
+
+3. SUBMIT CLAIM (after 30-day period):
+   Required documents:
+   - Specialist physician's diagnosis report
+   - Histopathology report (for cancer)
+   - ECG, troponin reports (for heart attack)
+   - MRI/CT scan reports (for stroke, MS)
+   - Hospital discharge summary
+   - Government ID proof
+   - Bank account details for direct transfer
+
+4. CLAIM ASSESSMENT:
+   - Our medical panel reviews within 15 working days
+   - May request additional reports or specialist opinion
+   - Independent medical examination if required
+
+5. PAYOUT:
+   - Direct bank transfer within 5 business days of approval
+   - Partial payout (50%) for Stage 1-2 cancer, balance held pending
+
+APPEALS: Disputes may be escalated to IRDAI Consumer Helpline: 155255""",
+            },
+            {
+                "section_title": "Frequently Asked Questions — Critical Illness Shield",
+                "section_number": 5,
+                "keywords": json.dumps(["faq", "question", "cancer", "heart attack", "kidney", "lump sum", "existing illness", "survivor"]),
+                "section_content": """Critical Illness Shield — Frequently Asked Questions
+
+Q: I was diagnosed with cancer last year. Can I enroll?
+A: Yes, but active cancer is a pre-existing condition. After the 3-month waiting period, new diagnoses or recurrences may be covered. Existing treatment is not retroactively covered.
+
+Q: My father had a heart attack. Is family history a problem?
+A: Not for eligibility, but a 10% premium loading applies for documented family history of cardiac disease or cancer.
+
+Q: Do I need a hospitalization plan as well?
+A: Yes. This plan pays a lump sum on diagnosis — it does not pay hospital bills directly. Combine with Standard or Premium Plan for complete coverage.
+
+Q: If I have a heart attack and then a stroke, can I claim twice?
+A: You can claim for each separate covered illness. Total payouts cannot exceed the sum insured (Rs 50,00,000).
+
+Q: What counts as Stage 1 cancer vs Stage 3?
+A: Staging is determined by your oncologist per TNM classification. Stage 1-2 = 50% payout. Stage 3-4 = 100% payout.
+
+Q: I survived a heart attack 5 years ago. Can I still enroll?
+A: Yes, with medical underwriting. Previous heart attack is a pre-existing condition; 3-month waiting period before new cardiac events are covered.""",
+            },
+        ],
+    },
+
+    # ─────────────────────────────────────────────────────────────
+    # POLICY 7: FAMILY FLOATER PLAN
+    # ─────────────────────────────────────────────────────────────
+    {
+        "name": "Family Floater Plan",
+        "plan_type": "family",
+        "monthly_premium_base": 12000.00,
+        "annual_deductible": 20000.00,
+        "max_coverage_limit": 3000000.00,
+        "copay_percentage": 20.0,
+        "coverage_details": json.dumps([
+            "Covers entire family (up to 2 adults + 4 children) under one premium",
+            "Shared pool: Rs 30,00,000 total for all members",
+            "Hospitalization for all members",
+            "Specialist consultations (up to 30/year per family)",
+            "Emergency room visits for all members",
+            "Maternity benefit for female members (after 9-month wait)",
+            "Children's vaccinations and well-baby check-ups",
+            "Prescription medications for all members",
+            "Pre/post-natal care",
+            "Dental for children (up to 18 years)",
+            "Vision care and spectacles for children",
+            "Mental health services for all members",
+            "Annual health check-up for all adults",
+        ]),
+        "exclusions": json.dumps([
+            "Cosmetic surgery",
+            "IVF and fertility treatments",
+            "Experimental treatments",
+            "Pre-existing conditions in first 12 months (standard waiting period)",
+            "Injuries from adventure sports without rider",
+            "Alcohol or drug-related illness",
+            "War and nuclear hazard",
+        ]),
+        "age_min": 18,
+        "age_max": 65,
+        "smoker_surcharge_pct": 20.0,
+        "bmi_surcharge_pct": 12.0,
+        "pre_existing_waiting_months": 12,
+        "sections": [
+            {
+                "section_title": "How Family Floater Works",
+                "section_number": 1,
+                "keywords": json.dumps(["family", "floater", "shared pool", "how it works", "members", "children", "spouse", "enroll"]),
+                "section_content": """Family Floater Plan — How It Works
+
+THE FLOATER CONCEPT:
+- One single sum insured (Rs 30,00,000) shared across all enrolled family members.
+- Any one member or all members may use the pool — total cannot exceed Rs 30,00,000 per year.
+- Example: If your spouse uses Rs 5,00,000 for hospitalization, Rs 25,00,000 remains for the rest of the family.
+
+WHO CAN BE ENROLLED:
+- Primary member (policyholder): age 18-65
+- Spouse: age 18-65
+- Children: age 0 (from day 1 of birth) up to age 25 (if studying full-time)
+- Maximum: 2 adults + 4 children
+
+PREMIUM:
+- One premium covers the entire family
+- Base premium calculated on eldest insured member's age and health profile
+- Each additional adult adds Rs 3,000/month
+- Children: Rs 500/month per child (first two free)
+
+ANNUAL DEDUCTIBLE:
+- Rs 20,000 per policy year (applies to the family as a whole, not per member)
+- Once deductible is met by any combination of members, all further claims are copay-only""",
+            },
+            {
+                "section_title": "Coverage — Family Floater Plan",
+                "section_number": 2,
+                "keywords": json.dumps(["covered", "hospitalization", "children", "maternity", "dental", "vision", "mental health", "specialist", "vaccination"]),
+                "section_content": """Family Floater Plan — Coverage Details
+
+ALL ADULT MEMBERS:
+- Hospitalization: private room (up to Rs 5,000/day), ICU fully covered
+- Emergency room visits: fully covered
+- Specialist consultations: up to 30 per year (family combined)
+- Prescription medications: covered
+- Preventive health check: Rs 3,500/person/year
+- Mental health: 15 outpatient therapy sessions/year per member
+- Physiotherapy: 20 sessions/year per member
+
+MATERNITY (female members, after 9-month wait):
+- Normal delivery: up to Rs 50,000
+- C-section: up to Rs 80,000
+- Pre/post-natal care: included
+- Newborn covered from birth
+
+CHILDREN (0-25 years if studying):
+- All hospitalization and emergency care: fully covered
+- Vaccinations (national immunization schedule): fully covered
+- Well-baby and annual check-ups: covered
+- Dental: basic check-up, filling, extraction (up to Rs 8,000/year)
+- Vision: spectacles/contact lenses (up to Rs 3,000/year)
+- Specialist consultations: counted toward family pool of 30/year
+
+SPECIAL BENEFITS:
+- Second opinion for major diagnosis: 2 per year (free teleconsult)
+- Air ambulance: up to Rs 1,00,000 per event
+- International emergency cover: up to Rs 2,00,000 (travel within Asia)""",
+            },
+            {
+                "section_title": "Premiums and Examples — Family Floater Plan",
+                "section_number": 3,
+                "keywords": json.dumps(["premium", "cost", "price", "example", "family", "children", "spouse", "monthly", "calculation"]),
+                "section_content": """Family Floater Plan — Premium Structure
+
+BASE PREMIUM (based on eldest adult member):
+- Eldest aged 18-30: Rs 8,000/month
+- Eldest aged 31-40: Rs 12,000/month
+- Eldest aged 41-50: Rs 16,000/month
+- Eldest aged 51-65: Rs 22,000/month
+
+ADDITIONS:
+- Second adult (spouse): Rs 3,000/month
+- Each child after 2: Rs 500/month
+
+SURCHARGES:
+- Any enrolled smoker: 20% on total premium
+- Any adult with BMI > 30: 12% on total premium
+
+EXAMPLES:
+1. Couple (35 & 32) + 2 kids: Rs 12,000 + Rs 3,000 = Rs 15,000/month
+2. Couple (45 & 42) + 3 kids: Rs 16,000 + Rs 3,000 + Rs 500 = Rs 19,500/month
+3. Couple (50 & 47, one smoker): Rs 22,000 + Rs 3,000 = Rs 25,000 × 1.20 = Rs 30,000/month
+
+DEDUCTIBLE: Rs 20,000 per family per year
+COPAY: 20% per approved claim
+OUT-OF-POCKET MAXIMUM: Rs 1,20,000 per family per year""",
+            },
+            {
+                "section_title": "Claims — Family Floater Plan",
+                "section_number": 4,
+                "keywords": json.dumps(["claim", "submit", "cashless", "process", "reimbursement", "documents", "family", "member"]),
+                "section_content": """Family Floater Plan — Claims Process
+
+EACH FAMILY MEMBER HAS THEIR OWN HEALTH CARD linked to the family policy number.
+
+CASHLESS CLAIMS:
+- Present member's health card at any empanelled hospital
+- Hospital contacts TPA for pre-authorization
+- Emergency: cashless within 2 hours; Planned: within 4 hours
+- No upfront payment required at network hospitals
+
+REIMBURSEMENT CLAIMS:
+1. Notify within 48 hours of hospitalization
+2. Collect all original bills and discharge summary
+3. Submit within 30 days of discharge via app or email
+4. Reimbursement within 10 business days
+
+TRACKING FAMILY POOL USAGE:
+- Log in to the HealthInsure app to see each member's usage and remaining pool
+- SMS alert sent when 50% and 80% of pool is consumed
+
+ANNUAL POLICY RENEWAL:
+- Pool resets to Rs 30,00,000 on renewal date
+- Unclaimed amounts do not carry forward
+- Members can be added/removed at renewal
+
+FAMILY HELPLINE: 1800-FAMILY-CARE (1800-326-459-2273)""",
+            },
+            {
+                "section_title": "Frequently Asked Questions — Family Floater Plan",
+                "section_number": 5,
+                "keywords": json.dumps(["faq", "question", "family", "child", "maternity", "pool", "shared", "spouse", "add member"]),
+                "section_content": """Family Floater Plan — Frequently Asked Questions
+
+Q: If my wife has a difficult delivery costing Rs 90,000, how much will we get?
+A: After the Rs 20,000 family deductible and 20% copay on the remaining Rs 70,000 (Rs 14,000), the plan pays Rs 56,000. Total out-of-pocket: Rs 34,000.
+
+Q: Our new baby was just born. When is she covered?
+A: From day 1 of birth. Inform us within 30 days to formally add her to the policy.
+
+Q: My son is 22 and in college. Is he still covered?
+A: Yes, children up to age 25 who are full-time students remain covered. Proof of enrollment may be required at claim time.
+
+Q: Can my parents be added?
+A: Parents cannot be added to the Family Floater. They would need their own policy (Senior Care Plan is ideal for parents aged 55+).
+
+Q: What happens if one member uses the entire Rs 30,00,000?
+A: The pool is exhausted for the policy year. Other members would have to pay out-of-pocket until renewal. Consider increasing sum insured at renewal.
+
+Q: Can we add a member mid-year?
+A: New babies can be added anytime. Other members (spouse, additional children) can only be added at annual renewal or within 30 days of a qualifying life event (marriage, adoption).""",
+            },
+        ],
+    },
 ]
 
 
