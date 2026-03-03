@@ -113,12 +113,20 @@ def _seed_demo_users(db):
 def _seed_demo_claims(db):
     from app.services.risk_scoring import calculate_risk_score
 
-    if db.query(Claim).count() > 0:
-        return  # Claims already seeded
-
     users = {u.email: u for u in db.query(User).all()}
     policies_map = {p.name: p for p in db.query(Policy).all()}
     insurer = users.get("admin@insurer.com")
+
+    # Only seed claims for patients who have none yet
+    patient_ids_with_claims = {
+        row[0] for row in db.query(Claim.patient_id).distinct().all()
+    }
+    patients_needing_claims = {
+        email: u for email, u in users.items()
+        if u.role == "patient" and u.id not in patient_ids_with_claims
+    }
+    if not patients_needing_claims:
+        return
 
     if not insurer or not policies_map:
         print("Skipping claims seed: users or policies not ready.")
@@ -516,8 +524,11 @@ def _seed_demo_claims(db):
 
     for cd in raw_claims:
         patient = users.get(cd["email"])
+        # Skip if this patient already has claims
+        if not patient or cd["email"] not in patients_needing_claims:
+            continue
         policy_obj = policies_map.get(cd["policy"]) or fallback
-        if not patient or not policy_obj:
+        if not policy_obj:
             continue
 
         risk_score, risk_level = calculate_risk_score(

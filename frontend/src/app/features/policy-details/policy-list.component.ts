@@ -20,9 +20,9 @@ import { ApiService } from '../../core/services/api.service';
 
       <div class="policies-grid">
         @for (policy of filteredPolicies(); track policy.id) {
-          <div class="policy-card" [class.basic]="policy.plan_type === 'basic'" [class.standard]="policy.plan_type === 'standard'" [class.premium]="policy.plan_type === 'premium'">
+          <div class="policy-card" [ngClass]="policy.plan_type">
             <div class="card-header">
-              <span class="plan-badge">{{ policy.plan_type | uppercase }}</span>
+              <span class="plan-badge">{{ planLabel(policy.plan_type) }}</span>
               <h3>{{ policy.name }}</h3>
             </div>
             <div class="card-body">
@@ -76,10 +76,14 @@ import { ApiService } from '../../core/services/api.service';
     .policies-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
     .policy-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden; transition: transform 0.2s; }
     .policy-card:hover { transform: translateY(-4px); box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
-    .card-header { padding: 20px; color: #fff; }
+    .card-header { padding: 20px; color: #fff; background: #455A64; }
     .policy-card.basic .card-header { background: #1565C0; }
     .policy-card.standard .card-header { background: #00897B; }
     .policy-card.premium .card-header { background: #6A1B9A; }
+    .policy-card.senior .card-header { background: #E65100; }
+    .policy-card.maternity .card-header { background: #AD1457; }
+    .policy-card.critical .card-header { background: #B71C1C; }
+    .policy-card.family .card-header { background: #2E7D32; }
     .plan-badge { background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
     .card-header h3 { margin: 8px 0 0; }
     .card-body { padding: 20px; }
@@ -121,5 +125,18 @@ export class PolicyListComponent implements OnInit {
   toggleSection(policyId: number, section: string) {
     const key = policyId + '-' + section;
     this.expandedSections[key] = !this.expandedSections[key];
+  }
+
+  planLabel(type: string): string {
+    const labels: Record<string, string> = {
+      basic: 'BASIC',
+      standard: 'STANDARD',
+      premium: 'PREMIUM',
+      senior: 'SENIOR CARE',
+      maternity: 'MATERNITY',
+      critical: 'CRITICAL ILLNESS',
+      family: 'FAMILY FLOATER',
+    };
+    return labels[type] ?? type.toUpperCase();
   }
 }
