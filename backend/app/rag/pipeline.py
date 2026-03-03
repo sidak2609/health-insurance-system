@@ -10,6 +10,28 @@ from app.models.schemas import ChatResponse, CitationItem
 
 assessor = EligibilityAssessor()
 
+_INSURANCE_KEYWORDS = {
+    "insurance", "policy", "policies", "coverage", "covered", "cover", "claim", "claims",
+    "premium", "deductible", "copay", "co-pay", "eligible", "eligibility", "qualify",
+    "benefit", "benefits", "hospital", "hospitalization", "medical", "medicine",
+    "prescription", "diagnosis", "treatment", "surgery", "doctor", "health",
+    "waiting period", "pre-existing", "exclusion", "exclusions", "reimbursement",
+    "insurer", "plan", "enroll", "enrolled", "maternity", "dental", "vision",
+    "mental health", "physiotherapy", "emergency", "laboratory", "outpatient",
+    "inpatient", "network", "cashless", "sum insured", "rider", "renewal",
+    "bmi", "smoker", "smoking", "age limit", "family floater", "critical illness",
+}
+
+def _is_off_topic(message: str) -> bool:
+    """Return True if the message has no health-insurance-related keywords."""
+    lower = message.lower()
+    return not any(kw in lower for kw in _INSURANCE_KEYWORDS)
+
+_OFF_TOPIC_REPLY = (
+    "I'm your HealthInsure assistant and can only help with health insurance questions. "
+    "Please ask me about your coverage, premiums, claims, eligibility, or policy details."
+)
+
 # Lazy Anthropic client
 _anthropic_client = None
 
@@ -87,7 +109,7 @@ INSTRUCTIONS:
 - If asked about claims, reference their actual claim history shown above.
 - Use ₹ (Indian Rupee) for all amounts.
 - Keep responses clear, concise, and friendly. Use bullet points for lists.
-- If the question is outside insurance scope, acknowledge it and suggest contacting the insurer at support@healthinsure.in or calling 1800-XXX-XXXX.
+- IMPORTANT: You ONLY answer questions about health insurance — coverage, premiums, claims, eligibility, policies, deductibles, waiting periods, and related medical/financial topics. If the user asks about ANYTHING unrelated to health insurance (e.g. recipes, sports, general knowledge, coding, current events, jokes, etc.), you MUST respond ONLY with: "I'm your HealthInsure assistant and can only help with health insurance questions. Please ask me about your coverage, premiums, claims, or eligibility." Do NOT attempt to answer off-topic questions at all.
 - Never make up coverage details not supported by the policy sections above.
 - At the end of your response, suggest 2-3 relevant follow-up questions the patient might want to ask, formatted as a JSON array on the last line like: FOLLOWUPS: ["question1", "question2", "question3"]"""
 
@@ -119,6 +141,24 @@ def process_chat_message(
     # Save user message
     db.add(ChatMessage(session_id=session.id, role="user", content=message))
     db.commit()
+
+    # Off-topic guard — refuse non-insurance queries immediately
+    if _is_off_topic(message):
+        db.add(ChatMessage(
+            session_id=session.id, role="assistant",
+            content=_OFF_TOPIC_REPLY, citations="[]", follow_up_questions="[]"
+        ))
+        db.commit()
+        return ChatResponse(
+            session_id=session.id,
+            message=_OFF_TOPIC_REPLY,
+            citations=[],
+            follow_up_questions=[
+                "What is my monthly premium?",
+                "What does my plan cover?",
+                "How do I submit a claim?",
+            ],
+        )
 
     # Fetch patient's recent claims
     claims_context = []

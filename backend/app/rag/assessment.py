@@ -197,21 +197,21 @@ class EligibilityAssessor:
         # --- PERSONALIZED PREMIUM ---
         if "premium" in intents or "eligibility" in intents or "general" in intents:
             calc_premium, premium_notes = _calculate_personalized_premium(policy, age, bmi, is_smoker)
-            parts.append(f"\n**Your Estimated Monthly Premium: ${calc_premium:,.2f}**")
+            parts.append(f"\n**Your Estimated Monthly Premium: ₹{calc_premium:,.2f}**")
             if premium_notes:
-                parts.append(f"*(Base: ${policy.monthly_premium_base:,.2f}, adjusted for: {', '.join(premium_notes)})*")
+                parts.append(f"*(Base: ₹{policy.monthly_premium_base:,.2f}, adjusted for: {', '.join(premium_notes)})*")
             else:
                 parts.append(f"*(Base rate — no surcharges apply to your profile)*")
-            parts.append(f"- Annual Deductible: ${policy.annual_deductible:,.2f}")
-            parts.append(f"- Max Coverage Limit: ${policy.max_coverage_limit:,.2f}")
+            parts.append(f"- Annual Deductible: ₹{policy.annual_deductible:,.2f}")
+            parts.append(f"- Max Coverage Limit: ₹{policy.max_coverage_limit:,.2f}")
             parts.append(f"- Copay: {policy.copay_percentage:.0f}%")
 
         # --- DEDUCTIBLE (standalone query) ---
         elif "deductible" in intents:
             parts.append(f"\n**Your Cost Sharing:**")
-            parts.append(f"- Annual Deductible: ${policy.annual_deductible:,.2f}")
+            parts.append(f"- Annual Deductible: ₹{policy.annual_deductible:,.2f}")
             parts.append(f"- Copay: {policy.copay_percentage:.0f}%")
-            parts.append(f"- Max Coverage: ${policy.max_coverage_limit:,.2f}")
+            parts.append(f"- Max Coverage: ₹{policy.max_coverage_limit:,.2f}")
 
         # --- PRE-EXISTING CONDITIONS ANALYSIS ---
         if conditions and ("eligibility" in intents or "coverage" in intents or "waiting_period" in intents or "general" in intents):
@@ -280,10 +280,10 @@ class EligibilityAssessor:
                 if pending:
                     parts.append(f"- **{len(pending)} Pending** — currently under review:")
                     for c in pending[:3]:
-                        parts.append(f"  - Claim #{c['id']} ({c['claim_type'].title()}): ${c['amount_claimed']:,.2f} claimed")
+                        parts.append(f"  - Claim #{c['id']} ({c['claim_type'].title()}): ₹{c['amount_claimed']:,.2f} claimed")
                 if approved:
                     total = sum(c.get("amount_approved") or 0 for c in approved)
-                    parts.append(f"- **{len(approved)} Approved** — ${total:,.2f} total approved")
+                    parts.append(f"- **{len(approved)} Approved** — ₹{total:,.2f} total approved")
                 if rejected:
                     parts.append(f"- **{len(rejected)} Rejected** on record")
                 if not claims_context:
@@ -309,11 +309,11 @@ class EligibilityAssessor:
         if "general" in intents and len(parts) <= 2:
             calc_premium, premium_notes = _calculate_personalized_premium(policy, age, bmi, is_smoker)
             parts.append(f"\n**Plan Overview:**")
-            parts.append(f"- Your Monthly Premium: **${calc_premium:,.2f}**")
+            parts.append(f"- Your Monthly Premium: **₹{calc_premium:,.2f}**")
             if premium_notes:
                 parts.append(f"  *(adjusted for {', '.join(premium_notes)})*")
-            parts.append(f"- Annual Deductible: ${policy.annual_deductible:,.2f}")
-            parts.append(f"- Max Coverage: ${policy.max_coverage_limit:,.2f}")
+            parts.append(f"- Annual Deductible: ₹{policy.annual_deductible:,.2f}")
+            parts.append(f"- Max Coverage: ₹{policy.max_coverage_limit:,.2f}")
             parts.append(f"- Copay: {policy.copay_percentage:.0f}%")
             parts.append(f"- Eligible Age Range: {policy.age_min}–{policy.age_max}")
 
