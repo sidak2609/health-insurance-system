@@ -90,8 +90,17 @@ def get_dashboard(
         for k, v in type_counter.most_common(10)
     ]
 
-    # Claims by status
-    status_counter = Counter(c.status for c in claims)
+    # Claims by status — merge pending and under_review into one bucket
+    status_counter = Counter()
+    for c in claims:
+        if c.status in ("pending", "under_review"):
+            status_counter["Pending Review"] += 1
+        elif c.status == "approved":
+            status_counter["Approved"] += 1
+        elif c.status == "rejected":
+            status_counter["Rejected"] += 1
+        else:
+            status_counter[c.status.replace("_", " ").title()] += 1
     claims_by_status = [DemographicBreakdown(label=k, count=v) for k, v in status_counter.items()]
 
     # Claims by policy

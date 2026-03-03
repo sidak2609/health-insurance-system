@@ -436,19 +436,17 @@ export class DashboardComponent implements OnInit {
 
   private buildPieChart(claimsByStatus: any[]): void {
     const statusColors: Record<string, string> = {
-      approved: '#43A047',
-      rejected: '#E53935',
-      pending: '#FFA726',
-      under_review: '#1565C0',
-      'under review': '#1565C0'
+      'approved': '#43A047',
+      'rejected': '#E53935',
+      'pending review': '#FFA726',
     };
 
     this.pieChartData = {
-      labels: claimsByStatus.map(s => s.label || s.status),
+      labels: claimsByStatus.map(s => s.label),
       datasets: [{
         data: claimsByStatus.map(s => s.count),
         backgroundColor: claimsByStatus.map(s =>
-          statusColors[(s.label || s.status || '').toLowerCase()] || '#90A4AE'
+          statusColors[(s.label || '').toLowerCase()] || '#90A4AE'
         )
       }]
     };
