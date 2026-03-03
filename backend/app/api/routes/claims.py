@@ -144,22 +144,33 @@ def review_claim(
     db.commit()
     db.refresh(claim)
 
-    log_action(db, f"claim_{data.status}", current_user.id, "claim", claim.id, {
-        "amount_approved": claim.amount_approved,
-        "rejection_reason": claim.rejection_reason,
+    # Store values now to avoid lazy-load issues after log_action's commit
+    patient_id = claim.patient_id
+    claim_type = claim.claim_type
+    claim_id_val = claim.id
+    amount_approved = claim.amount_approved
+    rejection_reason = claim.rejection_reason
+
+    log_action(db, f"claim_{data.status}", current_user.id, "claim", claim_id_val, {
+        "amount_approved": amount_approved,
+        "rejection_reason": rejection_reason,
     })
 
     # Notify patient
     status_label = "approved" if data.status == "approved" else "rejected"
+    msg = f"Your {claim_type} claim #{claim_id_val} has been {status_label}."
+    if data.status == "approved" and amount_approved is not None:
+        msg += f" Approved amount: ₹{amount_approved:,.2f}"
+    if rejection_reason:
+        msg += f" Reason: {rejection_reason}"
+
     notif = Notification(
-        user_id=claim.patient_id,
+        user_id=patient_id,
         title=f"Claim {status_label.title()}",
-        message=f"Your {claim.claim_type} claim #{claim.id} has been {status_label}."
-                + (f" Approved amount: ${claim.amount_approved:,.2f}" if data.status == "approved" else "")
-                + (f" Reason: {claim.rejection_reason}" if claim.rejection_reason else ""),
+        message=msg,
         notification_type=f"claim_{status_label}",
         related_entity_type="claim",
-        related_entity_id=claim.id,
+        related_entity_id=claim_id_val,
     )
     db.add(notif)
     db.commit()

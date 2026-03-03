@@ -11,6 +11,16 @@ import { ApiService } from '../../../core/services/api.service';
     <div class="claims-review-container">
       <h1>Claims Review</h1>
 
+      <!-- Global feedback banners -->
+      <div class="banner success-banner" *ngIf="globalSuccess">
+        {{ globalSuccess }}
+        <button class="close-banner" (click)="globalSuccess=''">×</button>
+      </div>
+      <div class="banner error-banner" *ngIf="globalError">
+        {{ globalError }}
+        <button class="close-banner" (click)="globalError=''">×</button>
+      </div>
+
       <!-- Filter Buttons -->
       <div class="filter-bar">
         <button
@@ -129,14 +139,14 @@ import { ApiService } from '../../../core/services/api.service';
             </div>
           </div>
 
-          <div class="detail-item full-width" *ngIf="selectedClaim.diagnosis">
-            <span class="detail-label">Diagnosis</span>
-            <span class="detail-value">{{ selectedClaim.diagnosis }}</span>
+          <div class="detail-item full-width" *ngIf="selectedClaim.description">
+            <span class="detail-label">Description</span>
+            <span class="detail-value">{{ selectedClaim.description }}</span>
           </div>
 
-          <div class="detail-item full-width" *ngIf="selectedClaim.treatment">
-            <span class="detail-label">Treatment</span>
-            <span class="detail-value">{{ selectedClaim.treatment }}</span>
+          <div class="detail-item full-width" *ngIf="selectedClaim.rejection_reason">
+            <span class="detail-label">Previous Rejection Reason</span>
+            <span class="detail-value">{{ selectedClaim.rejection_reason }}</span>
           </div>
         </div>
 
@@ -490,6 +500,33 @@ import { ApiService } from '../../../core/services/api.service';
     .success-msg { background: #e8f5e9; color: #2e7d32; }
     .error-msg { background: #ffebee; color: #c62828; }
 
+    .banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+
+    .success-banner { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+    .error-banner { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+
+    .close-banner {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: inherit;
+      line-height: 1;
+      padding: 0 4px;
+      opacity: 0.7;
+    }
+
+    .close-banner:hover { opacity: 1; }
+
     .loading {
       text-align: center;
       padding: 60px;
@@ -523,6 +560,8 @@ export class ClaimsReviewComponent implements OnInit {
   isSubmitting: boolean = false;
   reviewSuccess: string = '';
   reviewError: string = '';
+  globalSuccess: string = '';
+  globalError: string = '';
 
   amountApproved: number = 0;
   rejectionReason: string = '';
@@ -597,12 +636,13 @@ export class ClaimsReviewComponent implements OnInit {
 
     this.api.put(`/claims/${this.selectedClaim.id}/review`, payload).subscribe({
       next: () => {
-        this.reviewSuccess = 'Claim has been approved successfully.';
         this.isSubmitting = false;
+        this.globalSuccess = 'Claim approved successfully.';
         this.loadClaims();
+        this.closeReview();
       },
       error: (err) => {
-        this.reviewError = 'Failed to approve claim. Please try again.';
+        this.reviewError = `Failed to approve claim. ${err?.error?.detail || err?.status || 'Please try again.'}`;
         this.isSubmitting = false;
         console.error(err);
       }
@@ -623,12 +663,13 @@ export class ClaimsReviewComponent implements OnInit {
 
     this.api.put(`/claims/${this.selectedClaim.id}/review`, payload).subscribe({
       next: () => {
-        this.reviewSuccess = 'Claim has been rejected.';
         this.isSubmitting = false;
+        this.globalSuccess = 'Claim rejected successfully.';
         this.loadClaims();
+        this.closeReview();
       },
       error: (err) => {
-        this.reviewError = 'Failed to reject claim. Please try again.';
+        this.reviewError = `Failed to reject claim. ${err?.error?.detail || err?.status || 'Please try again.'}`;
         this.isSubmitting = false;
         console.error(err);
       }

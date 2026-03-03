@@ -147,7 +147,7 @@ class ClaimResponse(BaseModel):
     reviewer_id: Optional[int] = None
     rejection_reason: Optional[str] = None
     created_at: datetime
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
     patient_name: Optional[str] = None
     policy_name: Optional[str] = None
 
