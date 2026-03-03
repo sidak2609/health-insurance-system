@@ -11,16 +11,6 @@ import { ApiService } from '../../../core/services/api.service';
     <div class="claims-review-container">
       <h1>Claims Review</h1>
 
-      <!-- Global feedback banners -->
-      <div class="banner success-banner" *ngIf="globalSuccess">
-        {{ globalSuccess }}
-        <button class="close-banner" (click)="globalSuccess=''">×</button>
-      </div>
-      <div class="banner error-banner" *ngIf="globalError">
-        {{ globalError }}
-        <button class="close-banner" (click)="globalError=''">×</button>
-      </div>
-
       <!-- Filter Buttons -->
       <div class="filter-bar">
         <button
@@ -77,8 +67,8 @@ import { ApiService } from '../../../core/services/api.service';
                 </span>
               </td>
               <td>
-                <span class="status-badge" [ngClass]="'status-' + (claim.status || '').toLowerCase().replace(' ', '-')">
-                  {{ claim.status }}
+                <span class="status-badge" [ngClass]="statusClass(claim.status)">
+                  {{ formatStatus(claim.status) }}
                 </span>
               </td>
               <td>{{ claim.created_at | date:'mediumDate' }}</td>
@@ -500,33 +490,6 @@ import { ApiService } from '../../../core/services/api.service';
     .success-msg { background: #e8f5e9; color: #2e7d32; }
     .error-msg { background: #ffebee; color: #c62828; }
 
-    .banner {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 16px;
-    }
-
-    .success-banner { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
-    .error-banner { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
-
-    .close-banner {
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      color: inherit;
-      line-height: 1;
-      padding: 0 4px;
-      opacity: 0.7;
-    }
-
-    .close-banner:hover { opacity: 1; }
-
     .loading {
       text-align: center;
       padding: 60px;
@@ -560,8 +523,6 @@ export class ClaimsReviewComponent implements OnInit {
   isSubmitting: boolean = false;
   reviewSuccess: string = '';
   reviewError: string = '';
-  globalSuccess: string = '';
-  globalError: string = '';
 
   amountApproved: number = 0;
   rejectionReason: string = '';
@@ -614,12 +575,17 @@ export class ClaimsReviewComponent implements OnInit {
     this.rejectionReason = '';
     this.reviewSuccess = '';
     this.reviewError = '';
+    this.isSubmitting = false;
+    setTimeout(() => {
+      document.querySelector('.review-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   }
 
   closeReview(): void {
     this.selectedClaim = null;
     this.reviewSuccess = '';
     this.reviewError = '';
+    this.isSubmitting = false;
   }
 
   approveClaim(): void {
@@ -637,9 +603,9 @@ export class ClaimsReviewComponent implements OnInit {
     this.api.put(`/claims/${this.selectedClaim.id}/review`, payload).subscribe({
       next: () => {
         this.isSubmitting = false;
-        this.globalSuccess = 'Claim approved successfully.';
+        this.reviewSuccess = '✓ Claim approved successfully.';
         this.loadClaims();
-        this.closeReview();
+        setTimeout(() => this.closeReview(), 2000);
       },
       error: (err) => {
         this.reviewError = `Failed to approve claim. ${err?.error?.detail || err?.status || 'Please try again.'}`;
@@ -664,9 +630,9 @@ export class ClaimsReviewComponent implements OnInit {
     this.api.put(`/claims/${this.selectedClaim.id}/review`, payload).subscribe({
       next: () => {
         this.isSubmitting = false;
-        this.globalSuccess = 'Claim rejected successfully.';
+        this.reviewSuccess = '✓ Claim rejected successfully.';
         this.loadClaims();
-        this.closeReview();
+        setTimeout(() => this.closeReview(), 2000);
       },
       error: (err) => {
         this.reviewError = `Failed to reject claim. ${err?.error?.detail || err?.status || 'Please try again.'}`;
@@ -674,5 +640,19 @@ export class ClaimsReviewComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  formatStatus(status: string): string {
+    const labels: Record<string, string> = {
+      'pending': 'Pending',
+      'under_review': 'Under Review',
+      'approved': 'Approved',
+      'rejected': 'Rejected',
+    };
+    return labels[status] ?? status;
+  }
+
+  statusClass(status: string): string {
+    return 'status-' + (status || '').toLowerCase().replace(/_/g, '-');
   }
 }
